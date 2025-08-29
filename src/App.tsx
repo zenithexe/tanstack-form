@@ -1,35 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useForm } from "@tanstack/react-form";
+import z from "zod";
+import { Input } from "./components/ui/input";
+
+const formSchema = z.object({
+  name: z.string().min(3, "Must be 3 chars"),
+  email: z.string(),
+});
 
 function App() {
-  const [count, setCount] = useState(0)
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+    validators: {
+      onChange: formSchema,
+      onDynamic: ({ value }) => {
+
+        
+        if (value.name === "Jalish") {
+          return { name: "Jalish is not allowed" };
+        }
+
+        return undefined
+      },
+    },
+  });
 
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <form>
+          <form.Field name="name">
+            {({ state, handleBlur, handleChange }) => {
+              console.log("State :::", state);
+
+              return (
+                <>
+                  <Input
+                    value={state.value}
+                    onBlur={handleBlur}
+                    onChange={(e) => handleChange(e.target.value)}
+                  />
+                  {state.meta.errors.length > 0 &&
+                    state.meta.errors[0]?.message}
+                </>
+              );
+            }}
+          </form.Field>
+
+          <form.Field name="email">
+            {({ state, handleBlur, handleChange }) => {
+              console.log("State :::", state);
+
+              return (
+                <>
+                  <Input
+                    value={state.value}
+                    onBlur={handleBlur}
+                    onChange={(e) => handleChange(e.target.value)}
+                  />
+                  {state.meta.errors.length > 0 &&
+                    state.meta.errors[0]?.message}
+                </>
+              );
+            }}
+          </form.Field>
+          <button
+            type={"submit"}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+          >
+            Submit
+          </button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
